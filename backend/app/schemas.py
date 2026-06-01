@@ -3,7 +3,7 @@ from typing import Any
 
 import re
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
 
 MATRICULE_REGEX = r"^\d{7}[A-Z]{3}\d{3}$"
 
@@ -117,7 +117,10 @@ class ExportHistoryCreate(BaseModel):
     enterprise_id: int
     period: str
     export_format: str = Field(default="xml")
-    metadata: dict[str, Any]
+    export_metadata: dict[str, Any] = Field(
+        validation_alias=AliasChoices("export_metadata", "metadata"),
+        serialization_alias="metadata",
+    )
 
 
 class ExportHistoryRead(BaseModel):
@@ -126,7 +129,10 @@ class ExportHistoryRead(BaseModel):
     period: str
     export_format: str
     status: str
-    metadata: dict[str, Any]
+    export_metadata: dict[str, Any] = Field(
+        validation_alias=AliasChoices("export_metadata", "metadata"),
+        serialization_alias="metadata",
+    )
     created_at: datetime
 
     class Config:

@@ -58,3 +58,13 @@ def test_retenue_source_arithmetic_fails() -> None:
             montant_retenue=110.0,
             montant_net=890.0,
         )
+
+
+def test_export_history_uses_non_reserved_metadata_attribute() -> None:
+    model_source = (PROJECT_ROOT / "backend" / "app" / "models.py").read_text()
+
+    model_lines = model_source.splitlines()
+
+    assert not any(line.startswith("    metadata: Mapped") for line in model_lines)
+    assert any(line.startswith("    export_metadata: Mapped") for line in model_lines)
+    assert 'mapped_column(\n        "metadata", JSON, nullable=False\n    )' in model_source

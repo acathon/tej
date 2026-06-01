@@ -119,7 +119,9 @@ class ExportHistory(Base):
     period: Mapped[str] = mapped_column(String(16), nullable=False)
     export_format: Mapped[str] = mapped_column(String(16), default="xml")
     status: Mapped[str] = mapped_column(String(32), default="pending")
-    metadata: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    export_metadata: Mapped[dict[str, Any]] = mapped_column(
+        "metadata", JSON, nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )

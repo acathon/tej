@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 
+from backend.app.api.v1.routes import router as v1_router
+
 app = FastAPI(title="TEJ-Fisc")
-
-
-@app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+app.include_router(v1_router)

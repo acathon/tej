@@ -1,18 +1,16 @@
+import importlib.util
 from pathlib import Path
 import sys
 
 import pytest
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(PROJECT_ROOT))
 
-try:
+PYDANTIC_AVAILABLE = importlib.util.find_spec("pydantic") is not None
+
+if PYDANTIC_AVAILABLE:
     from backend.app.schemas import MatriculeFiscal, RetenueSource  # noqa: E402
-    PYDANTIC_AVAILABLE = True
-except ModuleNotFoundError as exc:  # pragma: no cover - environment dependent
-    if exc.name != "pydantic":
-        raise
-    PYDANTIC_AVAILABLE = False
 
 
 @pytest.mark.parametrize(
@@ -58,3 +56,14 @@ def test_retenue_source_arithmetic_fails() -> None:
             montant_retenue=110.0,
             montant_net=890.0,
         )
+
+
+def test_export_history_uses_non_reserved_metadata_attribute() -> None:
+    model_path = PROJECT_ROOT / "backend" / "app" / "models" / "__init__.py"
+    model_source = model_path.read_text()
+
+    model_lines = model_source.splitlines()
+
+    assert not any(line.startswith("    metadata: Mapped") for line in model_lines)
+    assert any(line.startswith("    export_metadata: Mapped") for line in model_lines)
+    assert 'mapped_column(\n        "metadata", JSON, nullable=False\n    )' in model_source

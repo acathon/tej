@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Any
 
-import re
+from pydantic import AliasChoices, BaseModel, Field, field_validator, model_validator
 
-from pydantic import BaseModel, Field, field_validator, model_validator
-
-MATRICULE_REGEX = r"^\d{7}[A-Z]{3}\d{3}$"
+from backend.app.engine.validators import (
+    is_valid_matricule_fiscal,
+    normalize_matricule_fiscal,
+)
 
 
 class UserCreate(BaseModel):
@@ -51,8 +52,8 @@ class MatriculeFiscal(BaseModel):
     @field_validator("raw_value")
     @classmethod
     def validate_format(cls, value: str) -> str:
-        normalized = value.upper().replace("/", "").replace(" ", "")
-        if not re.match(MATRICULE_REGEX, normalized):
+        normalized = normalize_matricule_fiscal(value)
+        if not is_valid_matricule_fiscal(normalized):
             raise ValueError(
                 "Format de matricule fiscal invalide (Ex: 1234567AMN000)"
             )
@@ -117,7 +118,10 @@ class ExportHistoryCreate(BaseModel):
     enterprise_id: int
     period: str
     export_format: str = Field(default="xml")
-    metadata: dict[str, Any]
+    export_metadata: dict[str, Any] = Field(
+        validation_alias=AliasChoices("export_metadata", "metadata"),
+        serialization_alias="metadata",
+    )
 
 
 class ExportHistoryRead(BaseModel):
@@ -126,7 +130,10 @@ class ExportHistoryRead(BaseModel):
     period: str
     export_format: str
     status: str
-    metadata: dict[str, Any]
+    export_metadata: dict[str, Any] = Field(
+        validation_alias=AliasChoices("export_metadata", "metadata"),
+        serialization_alias="metadata",
+    )
     created_at: datetime
 
     class Config:

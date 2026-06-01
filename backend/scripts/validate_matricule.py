@@ -1,13 +1,15 @@
-import re
 import sys
+from pathlib import Path
 
-MAT_FISCAL_PATTERN = re.compile(r"^\d{7}[A-Z]{3}\d{3}$")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.append(str(PROJECT_ROOT))
+
+from backend.app.engine.validators import is_valid_matricule_fiscal  # noqa: E402
 
 
 def validate_matricule_fiscal(value: str) -> bool:
     """Validate Tunisian tax ID format: 1234567AMN000 or 1234567/A/M/N/000."""
-    normalized = value.upper().replace("/", "").replace(" ", "")
-    return bool(MAT_FISCAL_PATTERN.match(normalized))
+    return is_valid_matricule_fiscal(value)
 
 
 def main() -> int:

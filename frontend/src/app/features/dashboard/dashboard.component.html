@@ -1,0 +1,80 @@
+<section class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <p class="dashboard__eyebrow">Control Tower</p>
+      <h1>Tableau de bord multi-dossiers</h1>
+      <p class="dashboard__subtitle">
+        Vue macro des certificats de retenue à la source et de la conformité TEJ.
+      </p>
+    </div>
+    <div class="dashboard__actions">
+      <button class="button button--ghost">Exporter rapport</button>
+      <button class="button button--primary">Nouveau dossier</button>
+    </div>
+  </header>
+
+  <div class="bento-grid">
+    <article class="card card--glass">
+      <h2>Indicateurs de conformité</h2>
+      <div class="card__metrics">
+        <div class="metric metric--urgent">
+          <span class="metric__value">{{ urgentCount() }}</span>
+          <span class="metric__label">Urgent</span>
+        </div>
+        <div class="metric metric--progress">
+          <span class="metric__value">{{ inProgressCount() }}</span>
+          <span class="metric__label">En cours</span>
+        </div>
+        <div class="metric metric--validated">
+          <span class="metric__value">{{ validatedCount() }}</span>
+          <span class="metric__label">Validé</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="card card--glass card--wide">
+      <h2>Activité mensuelle</h2>
+      <div class="card__highlights">
+        @for (highlight of activityHighlights(); track highlight.title) {
+          <div class="highlight">
+            <p class="highlight__label">{{ highlight.title }}</p>
+            <p class="highlight__value">{{ highlight.value }}</p>
+            <p class="highlight__helper">{{ highlight.helper }}</p>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="card card--glass">
+      <h2>Collecte collaborative</h2>
+      <p class="card__body">
+        12 clients ont déposé leurs pièces ce mois-ci. 3 dossiers attendent une
+        validation finale.
+      </p>
+      <button class="button button--ghost">Ouvrir le portail client</button>
+    </article>
+
+    <article class="card card--glass card--wide">
+      <h2>Conformité par client</h2>
+      <div class="card__list">
+        @for (item of complianceItems(); track item.name) {
+          <div class="compliance-item">
+            <div>
+              <p class="compliance-item__name">{{ item.name }}</p>
+              <p class="compliance-item__note">{{ item.lastUpdate }}</p>
+            </div>
+            <span class="status" [attr.data-status]="item.status">
+              {{
+                item.status === "urgent"
+                  ? "Urgent"
+                  : item.status === "in-progress"
+                    ? "En cours"
+                    : "Validé"
+              }}
+            </span>
+          </div>
+        }
+      </div>
+    </article>
+  </div>
+</section>
